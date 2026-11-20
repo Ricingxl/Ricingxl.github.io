@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+  <meta name="theme-color" content="#f6f8fb" />
+  <meta name="description" content="CQU Postgraduate Planner · 重庆大学电气专硕考研学习管理系统" />
+  <title>CQU Planner — 2028 考研学习管理</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body class="auth-locked">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-icon">C<span>·</span></div><div><strong>CQU Planner</strong><small>2028 GRADUATE EXAM</small></div></div>
+      <div class="side-label">工作空间</div>
+      <nav class="nav" aria-label="主导航">
+        <button class="nav-item active" data-page="today"><span class="nav-symbol">▦</span> 今日任务</button>
+        <button class="nav-item" data-page="week"><span class="nav-symbol">▥</span> 每周课表</button>
+        <button class="nav-item" data-page="calendar"><span class="nav-symbol">▤</span> 学习日历</button>
+        <button class="nav-item" data-page="stats"><span class="nav-symbol">◴</span> 进度统计</button>
+        <button class="nav-item" data-page="feedback"><span class="nav-symbol">▧</span> 每日反馈</button>
+        <button class="nav-item" data-page="issues"><span class="nav-symbol">?</span> 问题与错题</button>
+        <button class="nav-item" data-page="data"><span class="nav-symbol">⇄</span> 同步与归档</button>
+      </nav>
+      <div class="side-bottom">
+        <div class="side-panel"><span class="side-panel-icon">✦</span><div><b>目标院校</b><p>重庆大学 · 电气工程专硕</p></div></div>
+        <div class="side-foot">2027 年 12 月初试目标<br><span>学习中心 v2.6</span></div>
+      </div>
+    </aside>
+    <div class="main-shell">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="打开导航">☰</button>
+        <div class="breadcrumb">学习管理 <span>/</span> <strong id="breadcrumb">账号登录</strong></div>
+        <div class="top-actions">
+          <span class="sync-status" id="syncStatus"><span class="status-dot"></span>本地模式</span>
+          <button class="button transfer-header" data-download-data>↓ 下载数据</button>
+          <button class="button transfer-header" data-upload-data>↑ 上传数据</button>
+          <button class="button login-button" id="loginBtn">Google 登录</button>
+        </div>
+      </header>
+      <main id="app" class="content"><section class="panel web-login"><h1>你的学习空间</h1><p>正在连接登录服务…</p><noscript>请启用JavaScript后使用个人账号登录。</noscript></section></main>
+    </div>
+  </div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <input type="file" id="uploadInput" accept=".zip,.xlsx,.csv,.json" hidden />
+  <script type="module" src="./web-entry.js"></script>
+</body>
+</html>

@@ -1,6 +1,6 @@
-import {canonical} from './model.mjs';
-import {digest,referencedImages} from './attachments.mjs';
-import {api,localDesktop} from './storage.mjs';
+import {canonical} from './model.mjs?v=2.7';
+import {digest,referencedImages} from './attachments.mjs?v=2.7';
+import {api,localDesktop} from './storage.mjs?v=2.7';
 
 const key=owner=>'cqu-download-checkpoint-v25:'+owner;
 export async function archiveCheckpoint(owner){

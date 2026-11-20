@@ -1,4 +1,4 @@
-import {isAllowedAccount} from './identity.mjs';
+import {isAllowedAccount} from './identity.mjs?v=2.7';
 
 // Public page must not import the application or open cached records before owner authentication.
 export function createWebSession({policy,loadApp,lock,unlock,signOut,reload,report}){

@@ -1,5 +1,5 @@
-import {api,localDesktop} from './storage.mjs';
-import {zip} from './workbook.mjs';
+import {api,localDesktop} from './storage.mjs?v=2.7';
+import {zip} from './workbook.mjs?v=2.7';
 
 export const hex=bytes=>[...bytes].map(b=>b.toString(16).padStart(2,'0')).join('');
 export const digest=async bytes=>hex(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)));

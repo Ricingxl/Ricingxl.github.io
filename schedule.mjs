@@ -1,4 +1,4 @@
-import {canonical, materialize, mergeRevisions, planFromTask, validateRevision} from './model.mjs';
+import {canonical, materialize, mergeRevisions, planFromTask, validateRevision} from './model.mjs?v=2.7';
 
 export const formats = {
   '课表': {version:'CQU-PLAN-1', headers:['格式版本','操作','任务ID','日期','开始时间','结束时间','类型','科目','任务内容','计划分钟','地点','备注']},

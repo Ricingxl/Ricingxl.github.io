@@ -1,4 +1,4 @@
-import {referencedImages,base64,unbase64} from './attachments.mjs';
+import {referencedImages,base64,unbase64} from './attachments.mjs?v=2.7';
 
 // Firestore 单文档限制内分片存放原图；正文修订仍只携带图片索引。
 const chunkSize=300000;

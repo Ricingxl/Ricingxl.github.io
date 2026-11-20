@@ -1,5 +1,5 @@
-import {desktop} from './desktop-config.js';
-import {canonical, mergeRevisions, materialize, headsFor} from './model.mjs';
+import {desktop} from './desktop-config.js?v=2.7';
+import {canonical, mergeRevisions, materialize, headsFor} from './model.mjs?v=2.7';
 
 const prefix = 'cqu-planner-v2:';
 export const localDesktop = Boolean(desktop);

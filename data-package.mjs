@@ -1,7 +1,7 @@
-import {zip,unzip,writeXlsx} from './workbook.mjs';
-import {referencedImages,digest,imageMime,validateAttachment} from './attachments.mjs';
-import {materialize} from './model.mjs';
-import {planTable,progressTables} from './schedule.mjs';
+import {zip,unzip,writeXlsx} from './workbook.mjs?v=2.7';
+import {referencedImages,digest,imageMime,validateAttachment} from './attachments.mjs?v=2.7';
+import {materialize} from './model.mjs?v=2.7';
+import {planTable,progressTables} from './schedule.mjs?v=2.7';
 
 const decode=bytes=>new TextDecoder('utf-8',{fatal:true}).decode(bytes);
 const extension={'image/jpeg':'jpg','image/png':'png','image/gif':'gif','image/webp':'webp'};

@@ -1,16 +1,18 @@
-import {firebaseConfig, allowedEmail, allowedUid} from './firebase-config.js';
-import {isAllowedAccount} from './identity.mjs';
-import {LocalStore, localDesktop, api, today, legacyRevisions, uuid} from './storage.mjs';
+import {firebaseConfig, allowedEmail, allowedUid} from './firebase-config.js?v=2.7';
+import {isAllowedAccount} from './identity.mjs?v=2.7';
+import {LocalStore, localDesktop, api, today, legacyRevisions, uuid} from './storage.mjs?v=2.7';
 
-import {canonical} from './model.mjs';
-import {formats, planTable, progressTables, csvEncode, csvDecode, identifyTable, previewTables, weekDates, addDays, minuteOfDay, overlaps} from './schedule.mjs';
-import {writeXlsx, readXlsx} from './workbook.mjs';
-import {weekView,issuesView,transferView} from './views.mjs';
-import {AttachmentStore,referencedImages,exportImageJson,importImageJson,issueBundle,base64} from './attachments.mjs';
-import {questionEditor,questionEntry,rowQuestions,formSnapshot,restoreForm} from './editors.mjs';
-import {downloadCloudImages,uploadCloudImages} from './cloud-images.mjs';
-import {createDataPackage,readDataPackage} from './data-package.mjs';
-import {archiveCheckpoint,pendingArchive,archiveReceipt,saveBrowserArchive,confirmBrowserFile} from './archive.mjs';
+import {canonical} from './model.mjs?v=2.7';
+import {formats, planTable, progressTables, csvEncode, csvDecode, identifyTable, previewTables, weekDates, addDays, minuteOfDay, overlaps} from './schedule.mjs?v=2.7';
+import {writeXlsx, readXlsx} from './workbook.mjs?v=2.7';
+import {weekView,issuesView,transferView} from './views.mjs?v=2.7';
+import {AttachmentStore,referencedImages,exportImageJson,importImageJson,issueBundle,base64} from './attachments.mjs?v=2.7';
+import {questionEditor,questionEntry,rowQuestions,formSnapshot,restoreForm} from './editors.mjs?v=2.7';
+import {downloadCloudImages,uploadCloudImages} from './cloud-images.mjs?v=2.7';
+import {createDataPackage,readDataPackage} from './data-package.mjs?v=2.7';
+import {archiveCheckpoint,pendingArchive,archiveReceipt,saveBrowserArchive,confirmBrowserFile} from './archive.mjs?v=2.7';
+import {bindCourseGestures} from './course-interactions.mjs?v=2.7';
+import {showCourseTimeEditor} from './course-editor.mjs?v=2.7';
 
 const app = document.getElementById('app');
 const state = {seed: [], tasks: [], archivedTasks: [], issues: [], issueFilter:'open', weekMode:'table', tablePreview:null, notes: {}, conflicts: [], selected: today(), page: 'today', filter: 'all'};
@@ -127,17 +129,44 @@ function renderData() {
     transferView(state.tablePreview,{html})+`<details class="panel storage-settings"><summary>同步与存储设置</summary><h2>当前保存位置</h2><p>${localDesktop ? '电脑数据目录：' + html(store.dataPath || '学习数据') : '当前设备的浏览器存储，请定期导出备份'}</p><p>档案：<strong>${html(store.owner === 'local' ? '未绑定账号的本机档案' : store.owner)}</strong></p><div class="task-extra"><label>打开本地档案 <select id="profileSelect">${profiles.map(owner => `<option value="${html(owner)}" ${owner === store.owner ? 'selected' : ''}>${html(owner === 'local' ? '本机档案（未绑定）' : owner)}</option>`).join('')}</select></label></div><p>${html(user ? '登录账号：' + user.email : '尚未登录；本地档案仍可离线使用')}</p><p>最近云端确认：${html(lastSync || '尚无')} · 待上传：${pending()}条 · 历史修订：${store.revisions.length}条</p><p>${html(cloudError || '电脑关闭时不接收云端数据，下次启动后补齐。')}</p><div class="actions-wrap"><button class="button" id="syncNow">立即同步</button><button class="button" id="copyLocal" ${!user ? 'disabled' : ''}>将本机档案合并到当前账号</button>${localDesktop ? '<button class="button" id="backupDb">创建数据库备份</button><button class="button" id="openFolder">打开数据目录</button>' : ''}</div><p class="footnote">JSON备份包含完整版本。CSV与日报用于整理，不用于替换数据库。导入JSON会先预览，合并记录并保留历史。</p></details>${state.conflicts.map(conflictCard).join('')}<details class="panel storage-settings"><summary>查看全部学习记录</summary><div class="panel-header"><h2>全部学习记录</h2><span>${state.tasks.length}项任务</span></div><div class="records-table"><table><thead><tr><th>日期</th><th>科目</th><th>任务</th><th>状态</th><th>实际分钟</th></tr></thead><tbody>${[...state.tasks,...state.archivedTasks].map(t => `<tr><td><button class="small-link" data-date="${t.date}">${html(t.date)}</button></td><td>${html(t.subject)}</td><td>${html(t.detail)}</td><td>${t.archived?'已归档 · ':''}${html(labels[t.status])}</td><td>${t.actualMinutes ?? '—'}</td></tr>`).join('')}</tbody></table></div></details>`;
 }
 function render() {
+  const previousWeek=app.querySelector('.week-scroll'),weekStart=previousWeek?.dataset.weekStart;
+  const weekScroll=previousWeek?{top:previousWeek.scrollTop,left:previousWeek.scrollLeft,cards:new Map([...previousWeek.querySelectorAll('[data-course-id]')].map(el=>[el.dataset.courseId,el.scrollTop]))}:null;
   captureDrafts();
   renderedParents.clear();
-  for (const t of [...state.tasks,...state.archivedTasks]) renderedParents.set('task:' + t.id, store.parents('task:' + t.id));
+  for (const t of [...state.tasks,...state.archivedTasks]) {
+    renderedParents.set('task:' + t.id,store.parents('task:' + t.id));
+    renderedParents.set('plan:' + t.id,store.parents('plan:' + t.id));
+  }
   renderedParents.set('note:' + state.selected, store.parents('note:' + state.selected));
   document.getElementById('breadcrumb').textContent = pages[state.page];
   document.querySelector('.top-actions').classList.toggle('on-data-page',state.page==='data');
   document.querySelectorAll('nav [data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === state.page));
   app.innerHTML = ({week:renderWeek, issues:renderIssues,today: renderToday, calendar: renderCalendar, stats: renderStats, feedback: renderFeedback, data: renderData})[state.page]();
   restoreDrafts();
+  const nextWeek=app.querySelector('.week-scroll');
+  if(weekScroll&&nextWeek&&nextWeek.dataset.weekStart===weekStart){
+    nextWeek.scrollTop=weekScroll.top;nextWeek.scrollLeft=weekScroll.left;
+    for(const card of nextWeek.querySelectorAll('[data-course-id]'))if(weekScroll.cards.has(card.dataset.courseId))card.scrollTop=weekScroll.cards.get(card.dataset.courseId);
+  }
   syncLabel();
 }
+
+let courseDialog=null;
+function editCourseTime(id){
+  if(courseDialog?.isConnected)return;
+  if(activeSaves||activeUploads||transferBusy){toast('正在保存，请稍后修改课程时间');return;}
+  const current=store,task=state.tasks.find(t=>t.id===id);
+  if(!task)return;
+  if(task.planConflict){toast('这节课有同步冲突，请先在“同步与归档”中处理');return;}
+  const key='plan:'+id,parents=[...(renderedParents.get(key)||current.parents(key))];
+  courseDialog=showCourseTimeEditor({task,tasks:()=>state.tasks,onClose:()=>{courseDialog=null;app.querySelector('[data-course-id="'+id+'"]')?.focus({preventScroll:true});},onSave:async payload=>{
+    if(current!==store)throw Error('账号档案已切换，请重新打开课程');
+    await saved(()=>current.save(key,payload,parents));
+    state.selected=payload.date;refresh(true);
+    toast(store.view().conflicts.some(c=>c.key===key)?'时间已保存；另一个设备也有修改，请到“同步与归档”处理冲突。':'课程时间已修改，实际学习记录和问题已保留');
+  }});
+}
+bindCourseGestures(document,editCourseTime);
 
 async function saved(action, form = null) {
   activeSaves++; syncLabel();
@@ -428,7 +457,6 @@ document.addEventListener('click', event => {
     if(t.hasAttribute('data-add-question')){const form=t.closest('form');form.querySelector('.question-entries').insertAdjacentHTML('beforeend',questionEntry(html));rememberDraft(form);paintImages();return;}
     if(t.hasAttribute('data-remove-question')){const form=t.closest('form');t.closest('.question-entry').remove();if(!form.querySelector('.question-entry'))form.querySelector('.question-entries').innerHTML=questionEntry(html);rememberDraft(form);paintImages();return;}
     if(t.dataset.removeImage!==undefined){const row=t.closest('.question-entry'),form=t.closest('form'),list=JSON.parse(row.dataset.attachments);list.splice(Number(t.dataset.removeImage),1);row.dataset.attachments=JSON.stringify(list);rememberDraft(form);paintImages();return;}
-    if(t.hasAttribute('data-scroll-course')){t.classList.toggle('scrolling');return;}
     if(t.id==='exportIssues'){download('CQU-ISSUES-1-'+today()+'.zip',await issueBundle(store.view(),images),'application/zip');return;}
     if(t.dataset.weekMode){state.weekMode=t.dataset.weekMode;refresh(true);}
     else if(t.dataset.week) {state.selected=addDays(weekDates(state.selected)[0],7*Number(t.dataset.week));refresh(true);}
